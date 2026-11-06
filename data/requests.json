@@ -1,0 +1,54 @@
+[
+  {
+    "id": "REQ-004",
+    "fullName": "Jordan Hayes",
+    "studentId": "ENG-2026/104",
+    "email": "jordan.hayes@university.edu",
+    "type": "Academic",
+    "message": "I would like to apply for an override permit for Math 301 because of schedule conflict.",
+    "status": "Submitted",
+    "response": "Hello Jordan, thank you for contacting the Student Support Desk. Your request has been logged under ticket reference REQ-004.\n\nAcademic advising inquiries and course waiver requests are reviewed by academic department counselors within 24 to 48 business hours. In the meantime, please ensure your prerequisite documentation or course code list is accessible in case your assigned advisor requires supplementary details.\n\nBest regards,\nStudent Support Desk Triage Team",
+    "responseTimestamp": "2026-11-06T15:51:48.067Z",
+    "createdAt": "2026-11-06T15:51:48.067Z",
+    "createdAtFormatted": "Nov 6, 2026, 03:51 PM"
+  },
+  {
+    "id": "REQ-001",
+    "fullName": "Maya Lin",
+    "studentId": "CS-2026/041",
+    "email": "maya.lin@university.edu",
+    "type": "Academic",
+    "message": "I need advisor approval to enroll in Advanced Algorithms (CS-402) as the prerequisite waiver was submitted last Friday.",
+    "status": "In Progress",
+    "response": "Hello Maya, your prerequisite waiver verification is currently under departmental review with the Computer Science Advising Committee. Typical review turnaround is 24 to 48 business hours. If approved, an electronic override permit will be attached to your student portal automatically.",
+    "responseTimestamp": "2026-11-05T14:50:53.145Z",
+    "createdAt": "2026-11-05T13:50:53.145Z",
+    "createdAtFormatted": "Yesterday, 10:15 AM"
+  },
+  {
+    "id": "REQ-002",
+    "fullName": "Marcus Davies",
+    "studentId": "ADM-9942/A",
+    "email": "m.davies@university.edu",
+    "type": "Administrative",
+    "message": "Requesting an updated proof of enrollment letter with official university seal for health insurance verification.",
+    "status": "Submitted",
+    "response": "Hello Marcus, thank you for submitting your document verification request. Official stamped enrollment letters are queued by the Registrar's Office daily at 11:00 AM and 3:00 PM. A PDF copy will be dispatched directly to your university inbox.",
+    "responseTimestamp": "2026-11-06T12:50:53.145Z",
+    "createdAt": "2026-11-06T11:50:53.145Z",
+    "createdAtFormatted": "Today, 8:30 AM"
+  },
+  {
+    "id": "REQ-003",
+    "fullName": "Sophia Chen",
+    "studentId": "BIO-1088/2",
+    "email": "sophia.chen@university.edu",
+    "type": "Other",
+    "message": "My keycard access to the Science Building Annex stopped working after the weekend maintenance upgrade.",
+    "status": "Resolved",
+    "response": "Hello Sophia, Campus Security has synchronized the NFC door controllers across the Science Building Annex. Your student RFID credentials have been refreshed in the security database. Please tap your card at the exterior reader to test access.",
+    "responseTimestamp": "2026-11-03T17:50:53.145Z",
+    "createdAt": "2026-11-03T15:50:53.145Z",
+    "createdAtFormatted": "Nov 3, 2026, 2:45 PM"
+  }
+]

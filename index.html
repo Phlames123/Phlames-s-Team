@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Support Desk</title>
+    <meta
+      name="description"
+      content="A responsive student support request desk with an Express backend, automated triage responses, and real-time status tracking."
+    />
+    <meta property="og:title" content="Student Support Desk" />
+    <meta
+      property="og:description"
+      content="Submit academic or administrative requests and receive an immediate automated triage response."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <!-- Top Live Backend Status Banner -->
+    <aside class="notice-banner backend-live" role="status" aria-label="Backend status notification">
+      <div class="notice-container">
+        <span class="status-indicator-dot" aria-hidden="true"></span>
+        <p class="notice-text">
+          <strong>Connected to Live Support Backend API.</strong> Requests are processed on the server and receive an immediate automated triage response.
+        </p>
+        <span id="backend-health-tag" class="backend-tag">Backend Active</span>
+      </div>
+    </aside>
+
+    <!-- Main Header -->
+    <header class="app-header">
+      <div class="header-container">
+        <div class="brand">
+          <div class="brand-icon" aria-hidden="true">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+              <path d="M6 12v5c3 3 9 3 12 0v-5" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="brand-title">Student Support Desk</h1>
+            <p class="brand-tagline">Academic &amp; Administrative Assistance</p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button id="load-sample-btn" type="button" class="btn btn-secondary btn-sm" title="Reload sample requests on the server">
+            Load Sample Data
+          </button>
+          <button id="clear-all-btn" type="button" class="btn btn-subtle btn-sm" title="Clear all stored requests on the server">
+            Reset All
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Live Toast / Status Announcement Region -->
+    <div
+      id="feedback-toast"
+      class="feedback-toast"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      hidden
+    >
+      <span class="toast-message" id="toast-message"></span>
+      <button type="button" id="toast-close" class="toast-close" aria-label="Dismiss notification">&times;</button>
+    </div>
+
+    <!-- Main Content Container: 2-column layout on >= 800px -->
+    <main class="main-wrapper">
+      <div class="content-grid">
+        <!-- LEFT COLUMN: Request Submission Form -->
+        <section class="card form-card" aria-labelledby="form-heading">
+          <div class="card-header">
+            <h2 id="form-heading" class="card-title">Submit a Request</h2>
+            <p class="card-subtitle">
+              Fill out the details below. Our automated desk system will immediately generate an official guidance response.
+            </p>
+          </div>
+
+          <form id="support-form" novalidate>
+            <!-- Full Name Field -->
+            <div class="form-group" id="group-fullname">
+              <label for="fullname" class="form-label">
+                Full Name <span class="required-mark" aria-hidden="true">*</span>
+                <span class="sr-only">(required)</span>
+              </label>
+              <input
+                type="text"
+                id="fullname"
+                name="fullname"
+                class="form-input"
+                placeholder="e.g. Alex Morgan"
+                autocomplete="name"
+                aria-describedby="fullname-error fullname-hint"
+                aria-invalid="false"
+              />
+              <span id="fullname-hint" class="form-hint">At least 3 characters</span>
+              <div id="fullname-error" class="error-msg" role="alert" aria-live="polite"></div>
+            </div>
+
+            <!-- Student ID Field -->
+            <div class="form-group" id="group-studentid">
+              <label for="studentid" class="form-label">
+                Student ID <span class="required-mark" aria-hidden="true">*</span>
+                <span class="sr-only">(required)</span>
+              </label>
+              <input
+                type="text"
+                id="studentid"
+                name="studentid"
+                class="form-input"
+                placeholder="e.g. STU-2026/894"
+                autocomplete="off"
+                aria-describedby="studentid-error studentid-hint"
+                aria-invalid="false"
+              />
+              <span id="studentid-hint" class="form-hint">4–20 characters (letters, numbers, / or -)</span>
+              <div id="studentid-error" class="error-msg" role="alert" aria-live="polite"></div>
+            </div>
+
+            <!-- Email Field -->
+            <div class="form-group" id="group-email">
+              <label for="email" class="form-label">
+                Email Address <span class="required-mark" aria-hidden="true">*</span>
+                <span class="sr-only">(required)</span>
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-input"
+                placeholder="alex.morgan@university.edu"
+                autocomplete="email"
+                aria-describedby="email-error"
+                aria-invalid="false"
+              />
+              <div id="email-error" class="error-msg" role="alert" aria-live="polite"></div>
+            </div>
+
+            <!-- Request Type Dropdown -->
+            <div class="form-group" id="group-requesttype">
+              <label for="requesttype" class="form-label">
+                Request Type <span class="required-mark" aria-hidden="true">*</span>
+                <span class="sr-only">(required)</span>
+              </label>
+              <div class="select-wrapper">
+                <select
+                  id="requesttype"
+                  name="requesttype"
+                  class="form-select"
+                  aria-describedby="requesttype-error"
+                  aria-invalid="false"
+                >
+                  <option value="" disabled selected>Select a category...</option>
+                  <option value="Academic">Academic (Courses, Grades, Advising)</option>
+                  <option value="Administrative">Administrative (Tuition, Records, Enrollment)</option>
+                  <option value="Other">Other Inquiry</option>
+                </select>
+              </div>
+              <div id="requesttype-error" class="error-msg" role="alert" aria-live="polite"></div>
+            </div>
+
+            <!-- Message Field with Live Character Counter -->
+            <div class="form-group" id="group-message">
+              <div class="label-with-counter">
+                <label for="message" class="form-label">
+                  Message <span class="required-mark" aria-hidden="true">*</span>
+                  <span class="sr-only">(required)</span>
+                </label>
+                <span
+                  id="char-counter"
+                  class="char-counter"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  <span id="char-count">0</span> / 500 characters
+                </span>
+              </div>
+              <textarea
+                id="message"
+                name="message"
+                rows="4"
+                maxlength="500"
+                class="form-textarea"
+                placeholder="Please describe your question or issue in detail (10–500 characters)..."
+                aria-describedby="message-error message-hint"
+                aria-invalid="false"
+              ></textarea>
+              <span id="message-hint" class="form-hint">Minimum 10 characters</span>
+              <div id="message-error" class="error-msg" role="alert" aria-live="polite"></div>
+            </div>
+
+            <!-- Submit Button with Loading Indicator -->
+            <div class="form-actions">
+              <button type="submit" id="submit-btn" class="btn btn-primary btn-block">
+                <svg
+                  class="btn-icon"
+                  id="submit-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+                <span id="submit-spinner" class="spinner" hidden aria-hidden="true"></span>
+                <span id="submit-btn-text">Submit Support Request</span>
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- RIGHT COLUMN: Submitted Requests List & Tracker -->
+        <section class="card list-card" aria-labelledby="tracker-heading">
+          <div class="card-header tracker-header">
+            <div>
+              <h2 id="tracker-heading" class="card-title">Request Tracker</h2>
+              <p class="card-subtitle">
+                Server-synchronized tickets with official desk guidance &amp; status updates.
+              </p>
+            </div>
+
+            <!-- Status Filter Control -->
+            <div class="filter-control">
+              <label for="status-filter" class="filter-label">Filter by status:</label>
+              <select id="status-filter" class="form-select filter-select" aria-controls="requests-list">
+                <option value="All">All Requests (<span id="count-all">0</span>)</option>
+                <option value="Submitted">Submitted (<span id="count-submitted">0</span>)</option>
+                <option value="In Progress">In Progress (<span id="count-in-progress">0</span>)</option>
+                <option value="Resolved">Resolved (<span id="count-resolved">0</span>)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Total summary banner -->
+          <div class="summary-bar" id="summary-bar" aria-live="polite">
+            <span id="summary-text">Loading requests from server...</span>
+            <button type="button" id="refresh-btn" class="btn-text-link" title="Refresh list from backend">
+              Sync Now
+            </button>
+          </div>
+
+          <!-- Container for Request Cards -->
+          <div
+            id="requests-list"
+            class="requests-list"
+            role="region"
+            aria-label="List of student support requests"
+          >
+            <!-- Injected dynamically via script.js -->
+          </div>
+
+          <!-- Friendly Empty State -->
+          <div id="empty-state" class="empty-state">
+            <div class="empty-icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+              </svg>
+            </div>
+            <h3 class="empty-title">No support requests yet</h3>
+            <p class="empty-desc">
+              When a student submits an inquiry through the form on the left, it is securely stored on the server and an automated response is generated.
+            </p>
+            <button type="button" id="empty-seed-btn" class="btn btn-secondary btn-sm">
+              Load Sample Requests
+            </button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Post-Submission Response Modal: Presents immediate automated response -->
+    <div
+      id="response-modal"
+      class="modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="response-modal-title"
+      hidden
+    >
+      <div class="modal-dialog modal-dialog-lg">
+        <div class="response-modal-header">
+          <div class="response-status-badge">
+            <span class="status-dot"></span>
+            <span>Request Received</span>
+          </div>
+          <span class="response-ticket-id" id="response-ticket-id">REQ-000</span>
+        </div>
+
+        <h3 id="response-modal-title" class="modal-title">Support Request Logged</h3>
+        <p class="modal-desc">
+          Your request was submitted to the backend server. Here is your initial desk triage guidance:
+        </p>
+
+        <!-- Official Response Box -->
+        <div class="official-response-card">
+          <div class="official-response-head">
+            <div class="official-badge">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              <span>Official Desk Response</span>
+            </div>
+            <time id="response-modal-time" class="response-time"></time>
+          </div>
+          <div id="response-modal-body" class="official-response-body">
+            <!-- Populated via script.js using textContent -->
+          </div>
+        </div>
+
+        <div class="modal-actions response-actions">
+          <button type="button" id="response-view-tracker-btn" class="btn btn-primary">
+            View in Request Tracker
+          </button>
+          <button type="button" id="response-close-btn" class="btn btn-secondary">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accessible Custom Delete Confirmation Dialog -->
+    <div
+      id="confirm-modal"
+      class="modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirm-modal-title"
+      aria-describedby="confirm-modal-desc"
+      hidden
+    >
+      <div class="modal-dialog">
+        <div class="modal-icon-badge" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            <line x1="10" y1="11" x2="10" y2="17" />
+            <line x1="14" y1="11" x2="14" y2="17" />
+          </svg>
+        </div>
+        <h3 id="confirm-modal-title" class="modal-title">Delete Request</h3>
+        <p id="confirm-modal-desc" class="modal-desc">
+          Are you sure you want to delete this request? This action cannot be undone.
+        </p>
+        <div class="modal-actions">
+          <button type="button" id="modal-cancel-btn" class="btn btn-secondary">
+            Cancel
+          </button>
+          <button type="button" id="modal-delete-btn" class="btn btn-danger">
+            Yes, Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-container">
+        <p>Student Support Desk &bull; Full-Stack Express Server &bull; Intelligent Triage Response System</p>
+      </div>
+    </footer>
+
+    <!-- Application script -->
+    <script src="/script.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "Student Support Desk",
+  "description": "A responsive, accessible support request desk with an Express backend, automated triage responses, and real-time status tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
